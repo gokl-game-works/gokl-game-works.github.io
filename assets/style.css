@@ -1341,3 +1341,45 @@ body.light .progress-card{
     grid-template-columns:1fr;
   }
 }
+
+
+/* Live Patch & Tools project */
+.tool-live-card .visual-green{
+  background:
+    radial-gradient(circle at 72% 62%, rgba(52,199,89,.28), transparent 34%),
+    radial-gradient(circle at 22% 22%, rgba(90,200,250,.18), transparent 28%),
+    linear-gradient(145deg, rgba(238,251,243,.9), rgba(216,245,228,.7));
+}
+body:not(.light) .tool-live-card .visual-green{
+  background:
+    radial-gradient(circle at 72% 62%, rgba(82,244,156,.18), transparent 34%),
+    radial-gradient(circle at 20% 20%, rgba(99,243,255,.12), transparent 28%),
+    linear-gradient(145deg, rgba(10,25,17,.96), rgba(14,34,24,.98));
+}
+.tool-download-links{
+  align-items:center;
+}
+.tool-download-primary{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 14px;
+  border-radius:999px;
+  background:#111;
+  color:#fff !important;
+  font-weight:800 !important;
+}
+body:not(.light) .tool-download-primary{
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  color:#041015 !important;
+  box-shadow:0 0 22px rgba(99,243,255,.16);
+}
+.release-notes-link{
+  display:inline-block;
+  margin-top:18px;
+  color:var(--blue);
+  font-weight:700;
+}
+body:not(.light) .release-notes-link{
+  color:var(--cyan);
+}

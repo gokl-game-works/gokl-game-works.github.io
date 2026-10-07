@@ -89,11 +89,9 @@
 - These values are placeholders and can be edited directly in `projects/dw8xlce.html`
 
 
-## Patch Installer Download
-Current public installer:
-`GOKL_GAME_WORKS_Patch_Installer_v0.6.1_Windows_x64.zip`
-
-Direct download:
-`https://github.com/gokl-game-works/gokl-patch-installer/releases/download/v0.6.1/GOKL_GAME_WORKS_Patch_Installer_v0.6.1_Windows_x64.zip`
-
-사이트의 다운로드 버튼은 현재 위 Release Asset으로 직접 연결됩니다.
+## GOKL Patch Installer
+- Version: v0.6.1
+- Platform: Windows x64
+- Repository: https://github.com/gokl-game-works/gokl-patch-installer
+- Release: https://github.com/gokl-game-works/gokl-patch-installer/releases/tag/v0.6.1
+- Direct download: https://github.com/gokl-game-works/gokl-patch-installer/releases/download/v0.6.1/GOKL_GAME_WORKS_Patch_Installer_v0.6.1_Windows_x64.zip
