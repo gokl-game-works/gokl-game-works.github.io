@@ -95,3 +95,13 @@
 - Repository: https://github.com/gokl-game-works/gokl-patch-installer
 - Release: https://github.com/gokl-game-works/gokl-patch-installer/releases/tag/v0.6.1
 - Direct download: https://github.com/gokl-game-works/gokl-patch-installer/releases/download/v0.6.1/GOKL_GAME_WORKS_Patch_Installer_v0.6.1_Windows_x64.zip
+
+
+## Automatic theme behavior — revised
+- 07:00–18:59: Apple-style Light
+- 19:00–06:59: Cyberpunk Dark
+- Theme is recalculated from the visitor's local device time on every reload
+- Clicking the theme button changes it only temporarily for the current page session
+- Reloading restores automatic time mode
+- Double-clicking the theme button immediately restores automatic mode
+- No persistent localStorage theme override

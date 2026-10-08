@@ -1,8 +1,7 @@
 const body = document.body;
 const toggle = document.getElementById('themeToggle');
 
-const THEME_KEY = 'gokl-theme';
-const MODE_KEY = 'gokl-theme-mode';
+let manualOverride = false;
 
 // Daytime: 07:00–18:59 => Apple light
 // Night:   19:00–06:59 => Cyberpunk dark
@@ -14,43 +13,41 @@ function themeFromTime() {
 function applyTheme(theme) {
   body.classList.toggle('light', theme === 'light');
   body.dataset.theme = theme;
+
   if (toggle) {
     toggle.textContent = theme === 'light' ? '◐' : '◑';
-    toggle.setAttribute('aria-label', theme === 'light' ? '다크 모드로 전환' : '라이트 모드로 전환');
-    toggle.title = theme === 'light' ? '현재: 라이트 모드 (클릭하면 수동 다크)' : '현재: 다크 모드 (클릭하면 수동 라이트)';
+    toggle.setAttribute(
+      'aria-label',
+      theme === 'light' ? '다크 모드로 임시 전환' : '라이트 모드로 임시 전환'
+    );
+    toggle.title =
+      theme === 'light'
+        ? '현재: 시간 자동 라이트 모드 · 클릭하면 임시 다크'
+        : '현재: 시간 자동 다크 모드 · 클릭하면 임시 라이트';
   }
 }
 
-// manual mode is respected across visits.
-// If no manual override exists, the theme follows local clock time.
-const savedMode = localStorage.getItem(MODE_KEY);
-const savedTheme = localStorage.getItem(THEME_KEY);
+// Always start from local device time on every page load.
+applyTheme(themeFromTime());
 
-if (savedMode === 'manual' && (savedTheme === 'light' || savedTheme === 'dark')) {
-  applyTheme(savedTheme);
-} else {
-  applyTheme(themeFromTime());
-}
-
+// A single click changes theme only for the current page session.
+// Reloading the page returns to automatic time-based mode.
 toggle?.addEventListener('click', () => {
+  manualOverride = true;
   const current = body.classList.contains('light') ? 'light' : 'dark';
-  const next = current === 'light' ? 'dark' : 'light';
-  applyTheme(next);
-  localStorage.setItem(THEME_KEY, next);
-  localStorage.setItem(MODE_KEY, 'manual');
+  applyTheme(current === 'light' ? 'dark' : 'light');
 });
 
-// Double click returns theme control to automatic time-based mode.
+// Double-click immediately returns to automatic time-based mode.
 toggle?.addEventListener('dblclick', () => {
-  localStorage.removeItem(THEME_KEY);
-  localStorage.setItem(MODE_KEY, 'auto');
+  manualOverride = false;
   applyTheme(themeFromTime());
 });
 
-// If the page remains open across the day/night boundary, update automatically
-// only when the user has not manually overridden the theme.
+// While the page stays open, switch automatically when the day/night boundary passes,
+// unless the user temporarily changed the theme in this session.
 setInterval(() => {
-  if (localStorage.getItem(MODE_KEY) !== 'manual') {
+  if (!manualOverride) {
     applyTheme(themeFromTime());
   }
 }, 60 * 1000);
