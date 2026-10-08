@@ -34,12 +34,14 @@
     "description": "GOKL GAME WORKS 프로젝트의 패치를 설치하기 위한 Windows x64 패치 설치 프로그램.",
     "detailUrl": "",
     "repoUrl": "https://github.com/gokl-game-works/gokl-patch-installer",
-    "downloadUrl": "https://github.com/gokl-game-works/gokl-patch-installer/releases/download/v0.6.1/GOKL_GAME_WORKS_Patch_Installer_v0.6.1_Windows_x64.zip",
-    "releaseUrl": "https://github.com/gokl-game-works/gokl-patch-installer/releases/tag/v0.6.1",
-    "version": "v0.6.1",
+    "downloadUrl": "",
+    "releaseUrl": "",
+    "version": "",
     "featured": false,
     "visualClass": "visual-green",
-    "order": 2
+    "order": 2,
+    "autoReleaseRepo": "gokl-game-works/gokl-patch-installer",
+    "assetPattern": "Windows_x64\\.zip$"
   },
   {
     "id": "porting-research",

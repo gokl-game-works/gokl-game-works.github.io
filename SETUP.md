@@ -123,3 +123,19 @@ status:
 - in-progress
 - released
 - coming-soon
+
+
+## GitHub Release 자동 연동
+
+`GOKL Patch Installer`는 이제 GitHub 최신 공개 Release를 자동 조회합니다.
+
+```json
+"autoReleaseRepo": "gokl-game-works/gokl-patch-installer",
+"assetPattern": "Windows_x64\\.zip$"
+```
+
+새 버전을 Release로 공개하면 사이트를 새로고침할 때 최신 버전과 ZIP 다운로드 링크가 자동 반영됩니다.
+
+- Draft Release는 제외
+- 최신 공개 Release 기준
+- Windows x64 ZIP asset을 우선 선택

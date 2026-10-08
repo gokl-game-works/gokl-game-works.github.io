@@ -198,7 +198,7 @@ function renderLatestRelease(){
   if(!p){latestReleaseMount.innerHTML='';return;}
   latestReleaseMount.innerHTML=`<div class="release-panel tool-release-panel">
     <div class="release-copy"><p class="eyebrow">PATCH &amp; TOOLS · LATEST RELEASE</p><h2>${esc(p.title)}</h2>
-    <p>현재 공개 버전은 <strong>${esc(p.version||'Latest')}</strong>입니다. ${esc(p.platform||'')}용 파일을 바로 다운로드할 수 있습니다.</p>
+    <p>현재 공개 버전은 <strong>${esc(p.version||'Latest')}</strong>입니다. ${esc(p.assetName || p.platform || '')} 파일을 바로 다운로드할 수 있습니다.</p>
     <div class="release-meta">${metaItems(p).map(x=>`<span>${esc(x)}</span>`).join('')}</div>
     ${p.releaseUrl?`<a class="release-notes-link" href="${esc(p.releaseUrl)}">릴리즈 정보 보기 ↗</a>`:''}</div>
     <a class="release-button" href="${esc(p.downloadUrl)}"><span>PATCH INSTALLER</span><b>DOWNLOAD ↓</b></a>
@@ -214,12 +214,55 @@ document.querySelectorAll('[data-filter]').forEach(btn=>{
   });
 });
 
+
+async function hydrateAutoReleases(projects){
+  return await Promise.all(projects.map(async project => {
+    if (!project.autoReleaseRepo) return project;
+    try {
+      const api = `https://api.github.com/repos/${project.autoReleaseRepo}/releases/latest`;
+      const response = await fetch(api, {
+        headers: { 'Accept': 'application/vnd.github+json' },
+        cache: 'no-store'
+      });
+      if (!response.ok) throw new Error(`GitHub release API ${response.status}`);
+      const release = await response.json();
+      const assets = Array.isArray(release.assets) ? release.assets : [];
+      let asset = null;
+
+      if (project.assetPattern) {
+        try {
+          const pattern = new RegExp(project.assetPattern, 'i');
+          asset = assets.find(a => pattern.test(a.name));
+        } catch (err) {
+          console.warn('Invalid assetPattern:', project.assetPattern);
+        }
+      }
+
+      if (!asset) {
+        asset = assets.find(a => /\.zip$/i.test(a.name)) || assets[0] || null;
+      }
+
+      return {
+        ...project,
+        version: release.tag_name || project.version || '',
+        releaseUrl: release.html_url || project.releaseUrl || '',
+        downloadUrl: asset?.browser_download_url || project.downloadUrl || '',
+        assetName: asset?.name || ''
+      };
+    } catch (error) {
+      console.warn(`Latest release lookup failed for ${project.autoReleaseRepo}`, error);
+      return project;
+    }
+  }));
+}
+
 async function loadProjects(){
   try{
     const r=await fetch(`data/projects.json?v=${Date.now()}`,{cache:'no-store'});
     if(!r.ok) throw new Error(`HTTP ${r.status}`);
-    projectData=await r.json();
-    if(!Array.isArray(projectData)) throw new Error('projects.json must be an array');
+    const rawProjects = await r.json();
+    if(!Array.isArray(rawProjects)) throw new Error('projects.json must be an array');
+    projectData = await hydrateAutoReleases(rawProjects);
     renderProjects();
     renderLatestRelease();
   }catch(err){
