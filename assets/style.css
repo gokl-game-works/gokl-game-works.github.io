@@ -1383,3 +1383,16 @@ body:not(.light) .tool-download-primary{
 body:not(.light) .release-notes-link{
   color:var(--cyan);
 }
+
+.project-loading,.project-empty,.project-load-error{
+  grid-column:1/-1;min-height:220px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;
+  text-align:center;border:1px solid var(--line);border-radius:28px;background:var(--surface);color:var(--muted);padding:30px;
+}
+.tool-download-primary{
+  display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:999px;background:#111;color:#fff!important;font-weight:800!important;
+}
+body:not(.light) .tool-download-primary{
+  background:linear-gradient(135deg,var(--cyan),var(--blue));color:#041015!important;box-shadow:0 0 22px rgba(99,243,255,.16);
+}
+.release-notes-link{display:inline-block;margin-top:18px;color:var(--blue);font-weight:700}
+body:not(.light) .release-notes-link{color:var(--cyan)}

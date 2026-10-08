@@ -132,35 +132,100 @@ motionCards.forEach((card, index) => {
 });
 
 // Override/augment filter behavior with fade/slide transitions.
-document.querySelectorAll('[data-filter]').forEach(button => {
-  button.addEventListener('click', () => {
-    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
-    button.classList.add('active');
 
-    const filter = button.dataset.filter;
 
-    motionCards.forEach(card => {
-      const shouldShow = filter === 'all' || card.dataset.kind === filter;
+const projectGrid = document.getElementById('projectGrid');
+const latestReleaseMount = document.getElementById('latestReleaseMount');
+let projectData = [];
+let currentFilter = 'all';
 
-      if (!shouldShow && card.style.display !== 'none') {
-        if (reduceMotion) {
-          card.style.display = 'none';
-        } else {
-          card.classList.add('is-hiding');
-          setTimeout(() => {
-            card.style.display = 'none';
-            card.classList.remove('is-hiding');
-          }, 220);
-        }
-      }
+function esc(v=''){return String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");}
 
-      if (shouldShow && card.style.display === 'none') {
-        card.style.display = '';
-        if (!reduceMotion) {
-          card.classList.add('is-showing');
-          setTimeout(() => card.classList.remove('is-showing'), 460);
-        }
-      }
-    });
+function metaItems(p){
+  return [...new Set([p.version,p.platform,p.gameId,p.emulator].filter(Boolean))];
+}
+
+function renderCard(p){
+  const meta = metaItems(p).map(x=>`<span>${esc(x)}</span>`).join('');
+  const links = [];
+  if(p.downloadUrl) links.push(`<a class="tool-download-primary" href="${esc(p.downloadUrl)}">DOWNLOAD ↓</a>`);
+  if(p.detailUrl) links.push(`<a href="${esc(p.detailUrl)}">VIEW PROJECT</a>`);
+  if(p.repoUrl) links.push(`<a href="${esc(p.repoUrl)}">GITHUB ↗</a>`);
+  if(p.releaseUrl) links.push(`<a href="${esc(p.releaseUrl)}">RELEASE NOTES ↗</a>`);
+  const live = (p.status==='released'||p.status==='in-progress') ? ' active-status' : '';
+  const featured = p.featured ? ' featured' : '';
+  const tool = (p.type==='tools' && p.status==='released') ? ' tool-live-card' : '';
+  return `<article class="project-card tilt-card${featured}${tool}" data-kind="${esc(p.type)}">
+    <div class="project-visual ${esc(p.visualClass||'visual-blue')}">
+      <div class="visual-top"><span class="visual-chip">${esc(p.typeLabel||p.type)}</span><span class="visual-no">${String(p.order||'').padStart(2,'0')}</span></div>
+      ${p.featured?'<div class="visual-hud"></div>':''}
+      <div class="visual-copy"><small>${esc(p.platform||'')}${p.version?` / ${esc(p.version)}`:''}</small><strong>${esc(p.title)}</strong></div>
+    </div>
+    <div class="project-content ${p.featured?'':'compact'}">
+      <div class="project-row-top"><div><span class="project-type">${esc(p.typeLabel||p.type)}</span><h3>${esc(p.subtitle||p.title)}</h3></div><span class="status${live}">${esc(p.statusLabel||p.status)}</span></div>
+      <p>${esc(p.description||'')}</p>
+      ${meta?`<div class="project-meta">${meta}</div>`:''}
+      ${links.length?`<div class="project-links tool-download-links">${links.join('')}</div>`:''}
+    </div>
+  </article>`;
+}
+
+function attachMotion(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('.project-card').forEach((card,i)=>{
+    if(!reduce){card.classList.add('card-enter');setTimeout(()=>{card.classList.add('card-enter-active');setTimeout(()=>card.classList.remove('card-enter','card-enter-active'),450)},70+i*70);}
+    if(!reduce && window.matchMedia('(hover:hover) and (pointer:fine)').matches){
+      card.addEventListener('mousemove',e=>{
+        const r=card.getBoundingClientRect(), x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+        card.style.setProperty('--mx',`${((e.clientX-r.left)/r.width)*100}%`);
+        card.style.setProperty('--my',`${((e.clientY-r.top)/r.height)*100}%`);
+        if(!document.body.classList.contains('light')) card.style.transform=`perspective(1000px) rotateX(${(-y*3.3).toFixed(2)}deg) rotateY(${(x*4.4).toFixed(2)}deg) translateY(-4px)`;
+      });
+      card.addEventListener('mouseleave',()=>{card.style.removeProperty('--mx');card.style.removeProperty('--my');card.style.transform='';});
+    }
+  });
+}
+
+function renderProjects(){
+  const rows=projectData.filter(p=>currentFilter==='all'||p.type===currentFilter).sort((a,b)=>(a.order||999)-(b.order||999));
+  projectGrid.innerHTML = rows.length ? rows.map(renderCard).join('') : '<div class="project-empty">이 분류에 등록된 프로젝트가 없습니다.</div>';
+  attachMotion();
+}
+
+function renderLatestRelease(){
+  if(!latestReleaseMount) return;
+  const p=projectData.find(x=>x.type==='tools'&&x.status==='released'&&x.downloadUrl);
+  if(!p){latestReleaseMount.innerHTML='';return;}
+  latestReleaseMount.innerHTML=`<div class="release-panel tool-release-panel">
+    <div class="release-copy"><p class="eyebrow">PATCH &amp; TOOLS · LATEST RELEASE</p><h2>${esc(p.title)}</h2>
+    <p>현재 공개 버전은 <strong>${esc(p.version||'Latest')}</strong>입니다. ${esc(p.platform||'')}용 파일을 바로 다운로드할 수 있습니다.</p>
+    <div class="release-meta">${metaItems(p).map(x=>`<span>${esc(x)}</span>`).join('')}</div>
+    ${p.releaseUrl?`<a class="release-notes-link" href="${esc(p.releaseUrl)}">릴리즈 정보 보기 ↗</a>`:''}</div>
+    <a class="release-button" href="${esc(p.downloadUrl)}"><span>PATCH INSTALLER</span><b>DOWNLOAD ↓</b></a>
+  </div>`;
+}
+
+document.querySelectorAll('[data-filter]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('[data-filter]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter=btn.dataset.filter||'all';
+    renderProjects();
   });
 });
+
+async function loadProjects(){
+  try{
+    const r=await fetch(`data/projects.json?v=${Date.now()}`,{cache:'no-store'});
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    projectData=await r.json();
+    if(!Array.isArray(projectData)) throw new Error('projects.json must be an array');
+    renderProjects();
+    renderLatestRelease();
+  }catch(err){
+    console.error(err);
+    projectGrid.innerHTML='<div class="project-load-error">프로젝트 데이터를 불러오지 못했습니다.<br><small>data/projects.json 파일을 확인해주세요.</small></div>';
+  }
+}
+loadProjects();
+

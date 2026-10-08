@@ -1,0 +1,23 @@
+[
+  {
+    "id": "new-game-id",
+    "title": "새 게임 한글패치",
+    "subtitle": "New Game Korean Patch",
+    "type": "localization",
+    "typeLabel": "한글화",
+    "platform": "PS3",
+    "gameId": "BLJM00000",
+    "emulator": "RPCS3",
+    "status": "in-progress",
+    "statusLabel": "IN PROGRESS",
+    "description": "프로젝트 설명을 입력하세요.",
+    "detailUrl": "projects/new-game.html",
+    "repoUrl": "",
+    "downloadUrl": "",
+    "releaseUrl": "",
+    "version": "",
+    "featured": false,
+    "visualClass": "visual-blue",
+    "order": 10
+  }
+]

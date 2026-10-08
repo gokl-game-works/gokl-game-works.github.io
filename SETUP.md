@@ -105,3 +105,21 @@
 - Reloading restores automatic time mode
 - Double-clicking the theme button immediately restores automatic mode
 - No persistent localStorage theme override
+
+
+## JSON 프로젝트 자동 관리
+메인 프로젝트 카드는 `data/projects.json`에서 자동 생성됩니다.
+
+새 한글패치가 생기면 `data/projects.json` 배열에 항목 하나만 추가하면 됩니다.
+복사용 예시는 `data/project-example.json`에 있습니다.
+
+type:
+- localization
+- porting
+- development
+- tools
+
+status:
+- in-progress
+- released
+- coming-soon
